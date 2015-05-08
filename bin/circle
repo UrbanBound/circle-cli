@@ -7,6 +7,13 @@ class Circle < Thor
     build = most_recent_branch_build unless build
     puts "beep boop retrying build: #{build}"
   end
+
+  desc "cancel", "cancels last build for this branch unless build number is supplied"
+  def cancel(build=nil)
+    build = most_recent_branch_build unless build
+    puts "beep boop canceling build: #{build}"
+  end
+
   no_commands do
     def most_recent_branch_build
       #TODO: implement
