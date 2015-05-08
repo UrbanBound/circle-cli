@@ -1,4 +1,18 @@
+#!/usr/bin/env ruby
 require "thor"
 class Circle < Thor
-  
+
+  desc "retry", "retries last build for this branch unless build number is supplied"
+  def retry(build=nil)
+    build = most_recent_branch_build unless build
+    puts "beep boop retrying build: #{build}"
+  end
+  no_commands do
+    def most_recent_branch_build
+      #TODO: implement
+      1337
+    end
+  end
 end
+
+Circle.start(ARGV)
