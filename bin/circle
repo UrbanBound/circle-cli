@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 require "thor"
+require "open3"
+require_relative "../lib/initializer.rb"
+
 class Circle < Thor
 
   desc "retry", "retries last build for this branch unless build number is supplied"
@@ -14,10 +17,23 @@ class Circle < Thor
     puts "beep boop canceling build: #{build}"
   end
 
+  desc "status", "shows the status of the last build and failures unless a build number is supplied"
+  def status(build=nil)
+    build = most_recent_branch_build unless build
+    puts "beep boop here is the status of the most recent build:"
+  end
+
   no_commands do
     def most_recent_branch_build
-      #TODO: implement
-      1337
+      res = CircleCi::Project.recent_builds_branch(@username, @project, current_branch)
+    end
+
+    def current_branch
+      Open3.popen3("git symbolic-ref --short HEAD") do |stdin, std_out, std_err, wait_thr|
+        raise "something broke" unless std_err.read == ""
+        branch = std_out.read
+        branch.gsub("\n", "")
+      end
     end
   end
 end
