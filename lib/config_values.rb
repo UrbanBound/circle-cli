@@ -1,7 +1,7 @@
 require 'pathname'
 require 'yaml'
 
-class Config
+class MyConfig
   attr_reader :config
 
   def self.get(key)
@@ -20,7 +20,9 @@ class Config
   end
 
   def load_config_file
-    YAML::load_file(File.join(config_dir, "config.yml"))
+    path = Pathname.new(config_dir) + "config.yml"
+    return Hash.new unless path.exist?
+    YAML::load_file(path)
   end
 
   def write_to_config_file

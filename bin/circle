@@ -4,24 +4,34 @@ require "open3"
 require_relative "../lib/initializer.rb"
 
 class Circle < Thor
+  class_option :verbose, type: :boolean, aliases: :v
+  class_option :username, aliases: :u
+  class_option :project, aliases: :p
 
-  def initialize
-    @username = Config.get(:username)
-    @project = Config.get(:project)
-    super
+  def initialize(*args)
+    super(*args)
+    @username = options[:username] || MyConfig.get("username")
+    @project = options[:project] || MyConfig.get("project")
+  end
+
+  desc "configure", "configures your gem"
+  def configure
+    config_query("username")
+    config_query("project")
+    config_query("circle_api_token")
   end
 
   desc "retry", "retries last build for this branch unless build number is supplied"
   def retry(build=nil)
+    check_set("username", @username)
+    check_set("project", @project)
     build = get_last_build_for_branch unless build
-    check_username_and_project
     CircleCi::Build.retry(@username, @project, @build || get_last_build_for_branch)
   end
 
   desc "cancel", "cancels last build for this branch unless build number is supplied"
   def cancel(build=nil)
     build = get_last_build_for_branch unless build
-    check_username_and_project
     CircleCi::Build.cancel(@username, @project, @build || get_last_build_for_branch)
   end
 
@@ -32,8 +42,23 @@ class Circle < Thor
   end
 
   no_commands do
-    def check_username_and_project
-      raise "this is a terrible method why do you even have it? are you some sort of procedural scum? just write your code correctly next time." unless defined? @username && defined? @project
+    def check_set(name, value)
+      if value.nil?
+        puts "This command requires a #{name} to be set. Either set with the --#{name}=#{name.upcase} for single run or configure your gem with the `configure` command"
+      end
+    end
+
+    def config_query(key)
+      #if config value is already set, ask if they want to change it
+      cv = MyConfig.get(key)
+      continue = true
+      if !cv.nil?
+        continue = yes?("`#{key}` is already set to #{cv}. Do you want to change it?")
+      end
+      return unless continue
+
+      val = ask("Enter value for #{key}")
+      MyConfig.set(key, val)
     end
 
     def get_last_build_for_branch
