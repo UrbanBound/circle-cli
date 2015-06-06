@@ -7,6 +7,7 @@ class Circle < Thor
   class_option :verbose, type: :boolean, aliases: :v
   class_option :username, aliases: :u
   class_option :project, aliases: :p
+  class_option :circle_api_token, aliases: :token
 
   def initialize(*args)
     super(*args)
@@ -25,6 +26,7 @@ class Circle < Thor
   def retry(build=nil)
     check_set("username", @username)
     check_set("project", @project)
+    check_set("circle_api_token", MyConfig.get("circle_api_token"))
     build = get_last_build_for_branch unless build
     CircleCi::Build.retry(@username, @project, @build || get_last_build_for_branch)
   end
