@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 require "thor"
 require "open3"
-require_relative "../lib/initializer.rb"
+require 'circleci'
+require_relative '../lib/config_values.rb'
 
 class Circle < Thor
   class_option :verbose, type: :boolean, aliases: :v
@@ -13,6 +14,9 @@ class Circle < Thor
     super(*args)
     @username = options[:username] || MyConfig.get("username")
     @project = options[:project] || MyConfig.get("project")
+    CircleCi.configure do |config|
+      config.token = MyConfig.get('circle_api_token')
+    end
   end
 
   desc "configure", "configures your gem"
