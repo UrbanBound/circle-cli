@@ -1,3 +1,10 @@
+PATH
+  remote: .
+  specs:
+    circle-cli (0.0.1)
+      circleci
+      thor
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -22,5 +29,4 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  circleci
-  thor
+  circle-cli!

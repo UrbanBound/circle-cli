@@ -11,9 +11,12 @@ Gem::Specification.new do |s|
   s.homepage      = "https://github.com/UrbanBound/circle-cli"
   s.summary       = "Interact with Circle CI from your command line."
   s.description   = "This is a command line tool that allows easy access to more common functions when using Circle CI."
+  s.executables   << 'circle'
+
+  s.add_runtime_dependency 'circleci'
+  s.add_runtime_dependency 'thor'
 
   s.files         = `git ls-files bin lib`.split("\n")
   s.platform      = Gem::Platform::RUBY
   s.require_paths = ['lib']
-  s.rubyforge_project = '[none]'
 end
